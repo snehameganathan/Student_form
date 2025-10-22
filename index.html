@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Form</title>
+    <style>
+        table {
+            border-style: groove;
+            width: 500px;
+            margin: 0 auto;
+        }
+
+        th,
+        td {
+            padding: 5px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        .error {
+            color: red;
+            font-size: 12px;
+        }
+
+        button:disabled {
+            background-color: gray;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body style="display:flex; flex-direction:column; align-items:center; text-align:center;">
+    <h1>STUDENT FORM</h1>
+    <div style="text-align:center; ">
+        <form id="studentForm" >
+            <table border="1" style="padding:7px;">
+                <tr>
+                    <td><label for="Name">Name</label></td>
+                    <td>
+                        <input style="width:98%" id="name" type="text">
+                        <div id="nameError" class="error"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="Age">Age</label></td>
+                    <td><input style="width:98%" id="age" type="number" required></td>
+                </tr>
+                <tr>
+                    <td><label for="gender">Gender</label></td>
+                    <td>
+                        <input type="radio" name="gender" id="male" value="Male"> Male
+                        <input type="radio" name="gender" id="female" value="Female"> Female
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="course">Course</label></td>
+                    <td>
+                        <select id="course" style="width:100%">
+                            <option value="">--Select--</option>
+                            <option value="JavaScript">JavaScript</option>
+                            <option value="HTML">HTML</option>
+                            <option value="CSS">CSS</option>
+                            <option value="Java">Java</option>
+                            <option value="Python">Python</option>
+                            <option value="React JS">React JS</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="email">E-mail</label></td>
+                    <td>
+                        <input style="width:98%" id="email" type="email">
+                        <div id="emailError" class="error"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="password">Password</label></td>
+                    <td>
+                        <input style="width:98%" id="password" type="password">
+                        <div id="passwordError" class="error"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center;">
+                        <button type="submit" id="submitBtn" disabled
+                            style="border:2px solid black; width: 100%; height:100%; padding:5px; cursor:pointer; background-color: greenyellow; font-weight:bold; color:black;">Save</button>
+                    </td>
+                </tr>
+            </table>
+        </form>
+
+    </div>
+
+
+    <h1 style="margin-top:50px;">STUDENT DETAILS</h1>
+    <div style="text-align:center;">
+        <table id="dataTable" border="1" style="padding:1px;">
+            <thead>
+                <tr>
+                    <th style="padding: 5px;">Name</th>
+                    <th style="padding: 5px;">Age</th>
+                    <th style="padding: 5px;">Gender</th>
+                    <th style="padding: 5px;">Course</th>
+                    <th style="padding: 5px;">Email</th>
+                    <th style="padding: 5px;">Action</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const studentForm = document.getElementById('studentForm');
+        const tableBody = document.getElementById('tableBody');
+        const submitBtn = document.getElementById('submitBtn');
+
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+
+        const nameError = document.getElementById('nameError');
+        const emailError = document.getElementById('emailError');
+        const passwordError = document.getElementById('passwordError');
+
+
+        function validateName() {
+            if (nameInput.value.trim() === "") {
+                nameError.textContent = "Name cannot be empty";
+                return false;
+            } else {
+                nameError.textContent = "";
+                return true;
+            }
+        }
+
+        function validateEmail() {
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(emailInput.value)) {
+                emailError.textContent = "Enter a valid email address";
+                return false;
+            } else {
+                emailError.textContent = "";
+                return true;
+            }
+        }
+
+        function validatePassword() {
+            if (passwordInput.value.length < 6) {
+                passwordError.textContent = "Password must be at least 6 characters";
+                return false;
+            } else {
+                passwordError.textContent = "";
+                return true;
+            }
+        }
+
+
+        function validateForm() {
+            if (validateName() && validateEmail() && validatePassword()) {
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = true;
+            }
+        }
+
+        nameInput.addEventListener('input', validateForm);
+        emailInput.addEventListener('input', validateForm);
+        passwordInput.addEventListener('input', validateForm);
+
+        studentForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            if (!validateName() || !validateEmail() || !validatePassword()) return;
+
+            const name = nameInput.value;
+            const age = document.getElementById('age').value;
+            const genderInput = document.querySelector('input[name="gender"]:checked');
+            const gender = genderInput ? genderInput.value : 'Not Specified';
+            const course = document.getElementById('course').value;
+            const email = emailInput.value;
+
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${name}</td>
+                <td>${age}</td>
+                <td>${gender}</td>
+                <td>${course}</td>
+                <td>${email}</td>
+                <td><button onclick="deleteRow(this)" style="background-color:red; color:white; padding:2px; cursor:pointer;">Delete</button></td>
+            `;
+            tableBody.appendChild(newRow);
+            studentForm.reset();
+            submitBtn.disabled = true;
+        });
+
+        function deleteRow(event) {
+            event.parentElement.parentElement.remove();
+        }
+    </script>
+</body>
+
+</html>
